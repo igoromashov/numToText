@@ -109,10 +109,10 @@ function numToText(num) {
 
   console.log("Производится расчёт:");
 
-  let textInteger = "";
+  const textInteger = [];
   let textCurrency = "";
 
-  for (let i = integer.length - 1; i >= 0; i = i - 3) {
+  for (let i = integer.length - 1, hundred = 0; i >= 0; i = i - 3) {
     const current = Number(integer[i]);
 
     console.log("integer.length: ", integer.length);
@@ -122,19 +122,19 @@ function numToText(num) {
 
     if (integer.length === 1) {
       // от 1 до 9
-      textInteger = units[current];
+      textInteger.unshift(units[current]);
       textCurrency = currency(current);
     } else if (integer.length === 2) {
       // от 10 до 99
       const previous = Number(integer[i - 1]);
       if (current === 0) {
-        textInteger = tens[previous];
+        textInteger.unshift(tens[previous]);
         textCurrency = currency(current);
       } else if (previous === 1) {
-        textInteger = elevens[current];
+        textInteger.unshift(elevens[current]);
         textCurrency = currency(`${previous}${current}`);
       } else if (previous > 1) {
-        textInteger = `${tens[previous]} ${units[current]}`;
+        textInteger.unshift(tens[previous], units[current]);
         textCurrency = currency(current);
       }
     } else if (integer.length > 2 && integer.length < 4) {
@@ -147,11 +147,11 @@ function numToText(num) {
           if (prePrevious === 0) {
             // дописать
           } else {
-            textInteger = hundreds[prePrevious];
+            textInteger.unshift(hundreds[prePrevious]);
             textCurrency = currency(current);
           }
         } else {
-          textInteger = `${hundreds[prePrevious]} ${tens[previous]}`;
+          textInteger.unshift(hundreds[prePrevious], tens[previous]);
           textCurrency = currency(current);
         }
       } else {
@@ -159,26 +159,36 @@ function numToText(num) {
           if (prePrevious === 0) {
             //дописать
           } else {
-            textInteger = `${hundreds[prePrevious]} ${units[current]}`;
+            textInteger.unshift(hundreds[prePrevious], units[current]);
             textCurrency = currency(current);
           }
         } else if (previous === 1) {
           if (prePrevious === 0) {
             //дописать
           } else {
-            textInteger = `${hundreds[prePrevious]} ${elevens[previous]}`;
+            textInteger.unshift(hundreds[prePrevious], elevens[previous]);
             textCurrency = currency(`${previous}${current}`);
           }
         } else {
-          textInteger = `${hundreds[prePrevious]} ${tens[previous]} ${units[current]}`;
+          textInteger.unshift(
+            hundreds[prePrevious],
+            tens[previous],
+            units[current]
+          );
           textCurrency = currency(current);
         }
       }
     }
+    hundred++;
   }
 
-  result = textInteger.slice(0, 1).toUpperCase() + textInteger.slice(1, textInteger.length) + textCurrency + " " + pennies(fraction);
+  console.log(textInteger);
+  
+  textInteger[0] = textInteger[0].slice(0, 1).toUpperCase() + textInteger[0].slice(1, textInteger[0].length);
+
+  result = textInteger.join(" ") + textCurrency + " " + pennies(fraction);
+
   return result;
 }
 
-console.log("358:", numToText(1358));
+console.log("358:", numToText(358));
