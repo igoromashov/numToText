@@ -1,21 +1,24 @@
 // Данная функция конвертирует число в текст.
-// Используется как скрипт для Google Sheets для формирования счетов.
+// Используется как скрипт для Google Sheets для формирования счетов на оплату.
 
 function numToText(num) {
   // функция выдачи валюты в необходимом падеже без указания количества
+  // корректность работы обеспечена только в рамках функции numToText
+  // т.к. обеспечена передача в функцию только валидных данных
   const currency = (lastDigit) => {
     lastDigit = Number(lastDigit);
-
     if (lastDigit === 0 || lastDigit > 4) {
-      return " рублей";
+      return "рублей";
     } else if (lastDigit === 1) {
-      return " рубль";
+      return "рубль";
     } else if (lastDigit > 1 && lastDigit <= 4) {
-      return " рубля";
+      return "рубля";
     }
   };
 
   // функция выдачи копеек в необходимом падеже с указанием количества
+  // корректность работы обеспечена только в рамках функции numToText
+  // т.к. обеспечена передача в функцию только валидных данных
   const pennies = (fraction) => {
     lastDigit =
       Number(fraction) > 20
@@ -34,6 +37,10 @@ function numToText(num) {
 
   let result = "";
 
+  // КАРТЫ НАИМЕНОВАНИЙ
+  // (для рубля => в мужском роде)
+
+  // карта наименования единиц
   const units = {
     1: "один",
     2: "два",
@@ -45,6 +52,8 @@ function numToText(num) {
     8: "восемь",
     9: "девять",
   };
+
+  // карта наименования чисел первого десятка
   const elevens = {
     1: "одиннадцать",
     2: "двенадцать",
@@ -56,6 +65,9 @@ function numToText(num) {
     8: "восемнадцать",
     9: "девятнадцать",
   };
+
+  // карта наименования количества десятков
+  // полное наименование формируется путем конкатенации с именем единиц (units)
   const tens = {
     1: "десять",
     2: "двадцать",
@@ -67,6 +79,8 @@ function numToText(num) {
     8: "восемьдесят",
     9: "девяносто",
   };
+
+  // карта наименований количества сотен
   const hundreds = {
     1: "сто",
     2: "двести",
@@ -78,6 +92,8 @@ function numToText(num) {
     8: "восемьсот",
     9: "девятьсот",
   };
+
+  // карта наименований количества тысяч
   const thousands = {
     1: "одна",
     2: "две",
@@ -90,42 +106,107 @@ function numToText(num) {
     9: units[9],
   };
 
-  const fixedNum = num.toFixed(2).toString(); // 100.00
-  const length = fixedNum.length;
-  const integer = fixedNum.slice(0, length - 3);
-  const fraction = fixedNum.slice(length - 2, length);
+  // карта имён степеней тысячи (классов)
+  // структура: mapDegree[k][n],
+  // т.е. n * 1000 ** k,
+  // где n - количественный множитель;
+  // k - степень тысячи
+  const mapDegree = {
+    // k = 1 - тысячи
+    1: {
+      1: "тысяча",
+      2: "тысячи",
+      3: this[2],
+      4: this[2],
+      5: "тысяч",
+      6: this[5],
+      7: this[5],
+      8: this[5],
+      9: this[5],
+    },
+    // k = 2 - миллионы
+    2: {
+      1: "миллион",
+      2: "миллиона",
+      3: this[2],
+      4: this[2],
+      5: "миллионов",
+      6: this[5],
+      7: this[5],
+      8: this[5],
+      9: this[5],
+    },
+    // k = 3 - миллиарды
+    3: {
+      1: "миллиард",
+      2: "миллиарда",
+      3: this[2],
+      4: this[2],
+      5: "миллиардов",
+      6: this[5],
+      7: this[5],
+      8: this[5],
+      9: this[5],
+    },
+    // k = 4 - триллионы
+    4: {
+      1: "триллион",
+      2: "триллиона",
+      3: this[2],
+      4: this[2],
+      5: "триллионов",
+      6: this[5],
+      7: this[5],
+      8: this[5],
+      9: this[5],
+    },
+  };
 
-  let rubles = "";
+  // конвертация полученного числа в строку (например 100.00)
+  const fixedNum = num.toFixed(2).toString();
+  // отделение целой части (все цифры до дробного разделителя)
+  const integer = fixedNum.slice(0, fixedNum.length - 3);
+  // отделение дробной части (все цифры после дробного разделителя)
+  const fraction = fixedNum.slice(fixedNum.length - 2, fixedNum.length);
 
+  //debugging
+  console.log("num: ", num);
   console.log("fixedNum: ", fixedNum);
   console.log("integer: ", integer);
   console.log("fraction: ", fraction);
   console.log("-------------");
 
+  // проверяем есть ли целая часть (рубли)
+  // если нет, возвращаем копейки
   if (integer == 0) {
-    console.log("Сработало условие 'целая часть равна нулю'");
+    console.log("Сработало условие 'целая часть равна нулю'"); //debugging
     return pennies(fraction);
   }
 
-  console.log("Производится расчёт:");
+  console.log("Производится расчёт:"); //debugging
 
-  const textInteger = [];
-  let textCurrency = "";
+  const textInteger = []; // массив, состоящий из слов, составляющих полное наименование целой части числа
+  let textCurrency = ""; // наименование валюты в правильном падеже
 
-  for (let i = integer.length - 1, hundred = 0; i >= 0; i = i - 3) {
+  // циклом проходим по строке справа налево с шагом 3,
+  // иммитируя проход по классам многозначного числа начиная с первого класса.
+  // указатель current указывает на последнюю (правую) цифру класса.
+  // hundredDegree - степень тысячи, вычисляется в процессе работы цикла,
+  // используется для назначения имени степени тысячи в правилном падеже
+  // nullClass - маркер нулевого класса (класс состоит из нулей - 000)
+  for (
+    let i = integer.length - 1, hundredDegree = 0, nullClass = false;
+    i >= 0;
+    i = i - 3
+  ) {
     const current = Number(integer[i]);
 
-    console.log("integer.length: ", integer.length);
-    console.log("i: ", i);
-    console.log("current: ", current);
-    console.log("-------------");
-
     if (integer.length === 1) {
-      // от 1 до 9
+      // для чисел от 1 до 9
       textInteger.unshift(units[current]);
       textCurrency = currency(current);
     } else if (integer.length === 2) {
-      // от 10 до 99
+      // для чисел от 10 до 99
       const previous = Number(integer[i - 1]);
       if (current === 0) {
         textInteger.unshift(tens[previous]);
@@ -138,18 +219,15 @@ function numToText(num) {
         textCurrency = currency(current);
       }
     } else if (integer.length > 2 && integer.length < 4) {
-      // от 100 до 999
+      // для чисел от 100 до 999
       const previous = Number(integer[i - 1]);
       const prePrevious = Number(integer[i - 2]);
 
       if (current === 0) {
         if (previous === 0) {
-          if (prePrevious === 0) {
-            // дописать
-          } else {
-            textInteger.unshift(hundreds[prePrevious]);
-            textCurrency = currency(current);
-          }
+          // prePrevios в таком случае не может быть равен нулю
+          textInteger.unshift(hundreds[prePrevious]);
+          textCurrency = currency(current);
         } else {
           textInteger.unshift(hundreds[prePrevious], tens[previous]);
           textCurrency = currency(current);
@@ -157,14 +235,16 @@ function numToText(num) {
       } else {
         if (previous === 0) {
           if (prePrevious === 0) {
-            //дописать
+            textInteger.unshift(units[current]);
+            textCurrency = currency(current);
           } else {
             textInteger.unshift(hundreds[prePrevious], units[current]);
             textCurrency = currency(current);
           }
         } else if (previous === 1) {
           if (prePrevious === 0) {
-            //дописать
+            textInteger.unshift(elevens[current]);
+            textCurrency = currency(`${previous}${current}`);
           } else {
             textInteger.unshift(hundreds[prePrevious], elevens[previous]);
             textCurrency = currency(`${previous}${current}`);
@@ -178,17 +258,27 @@ function numToText(num) {
           textCurrency = currency(current);
         }
       }
+    } else {
+      // для чисел x >= 1000
     }
-    hundred++;
+
+    if (hundredDegree === 0) {
+      textInteger.push(textCurrency);
+    }
+
+    hundredDegree++;
   }
 
   console.log(textInteger);
-  
-  textInteger[0] = textInteger[0].slice(0, 1).toUpperCase() + textInteger[0].slice(1, textInteger[0].length);
 
-  result = textInteger.join(" ") + textCurrency + " " + pennies(fraction);
+  textInteger[0] =
+    textInteger[0].slice(0, 1).toUpperCase() +
+    textInteger[0].slice(1, textInteger[0].length);
+
+  result = textInteger.join(" ") + " " + pennies(fraction);
 
   return result;
 }
 
-console.log("358:", numToText(358));
+//pretesting:
+console.log(numToText(501));
