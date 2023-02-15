@@ -6,13 +6,18 @@ function numToText(num) {
   // корректность работы обеспечена только в рамках функции numToText
   // т.к. обеспечена передача в функцию только валидных данных
   const currency = (lastDigit) => {
-    lastDigit = Number(lastDigit);
-    if (lastDigit === 0 || lastDigit > 4) {
+    if (lastDigit[0] === "0") {
+      // от 0 до 9
+      lastDigit = Number(lastDigit);
+      if (lastDigit === 0 || lastDigit > 4) {
+        return "рублей";
+      } else if (lastDigit === 1) {
+        return "рубль";
+      } else if (lastDigit > 1 && lastDigit <= 4) {
+        return "рубля";
+      }
+    } else if (lastDigit[0] === "1") {
       return "рублей";
-    } else if (lastDigit === 1) {
-      return "рубль";
-    } else if (lastDigit > 1 && lastDigit <= 4) {
-      return "рубля";
     }
   };
 
@@ -186,7 +191,9 @@ function numToText(num) {
   console.log("Производится расчёт:"); //debugging
 
   const textInteger = []; // массив, состоящий из слов, составляющих полное наименование целой части числа
-  let textCurrency = ""; // наименование валюты в правильном падеже
+  const textCurrency = currency(
+    integer.slice(integer.length - 2, integer.length)
+  );
 
   // циклом проходим по строке справа налево с шагом 3,
   // иммитируя проход по классам многозначного числа начиная с первого класса.
@@ -204,19 +211,15 @@ function numToText(num) {
     if (integer.length === 1) {
       // для чисел от 1 до 9
       textInteger.unshift(units[current]);
-      textCurrency = currency(current);
     } else if (integer.length === 2) {
       // для чисел от 10 до 99
       const previous = Number(integer[i - 1]);
       if (current === 0) {
         textInteger.unshift(tens[previous]);
-        textCurrency = currency(current);
       } else if (previous === 1) {
         textInteger.unshift(elevens[current]);
-        textCurrency = currency(`${previous}${current}`);
       } else if (previous > 1) {
         textInteger.unshift(tens[previous], units[current]);
-        textCurrency = currency(current);
       }
     } else if (integer.length > 2 && integer.length < 4) {
       // для чисел от 100 до 999
@@ -227,27 +230,21 @@ function numToText(num) {
         if (previous === 0) {
           // prePrevios в таком случае не может быть равен нулю
           textInteger.unshift(hundreds[prePrevious]);
-          textCurrency = currency(current);
         } else {
           textInteger.unshift(hundreds[prePrevious], tens[previous]);
-          textCurrency = currency(current);
         }
       } else {
         if (previous === 0) {
           if (prePrevious === 0) {
             textInteger.unshift(units[current]);
-            textCurrency = currency(current);
           } else {
             textInteger.unshift(hundreds[prePrevious], units[current]);
-            textCurrency = currency(current);
           }
         } else if (previous === 1) {
           if (prePrevious === 0) {
             textInteger.unshift(elevens[current]);
-            textCurrency = currency(`${previous}${current}`);
           } else {
             textInteger.unshift(hundreds[prePrevious], elevens[previous]);
-            textCurrency = currency(`${previous}${current}`);
           }
         } else {
           textInteger.unshift(
@@ -255,7 +252,6 @@ function numToText(num) {
             tens[previous],
             units[current]
           );
-          textCurrency = currency(current);
         }
       }
     } else {
@@ -263,7 +259,6 @@ function numToText(num) {
     }
 
     if (hundredDegree === 0) {
-      textInteger.push(textCurrency);
     }
 
     hundredDegree++;
@@ -275,7 +270,7 @@ function numToText(num) {
     textInteger[0].slice(0, 1).toUpperCase() +
     textInteger[0].slice(1, textInteger[0].length);
 
-  result = textInteger.join(" ") + " " + pennies(fraction);
+  result = textInteger.join(" ") + " " + textCurrency + " " + pennies(fraction);
 
   return result;
 }
