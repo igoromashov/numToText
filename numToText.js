@@ -2,6 +2,9 @@
 // Используется как скрипт для Google Sheets для формирования счетов на оплату.
 
 function numToText(num) {
+  if (!num) {
+    return ''
+  }
   // функция выдачи валюты в необходимом падеже без указания количества
   // корректность работы обеспечена только в рамках функции numToText
   // т.к. обеспечена передача в функцию только валидных данных
@@ -179,31 +182,18 @@ function numToText(num) {
   // отделение дробной части (все цифры после дробного разделителя)
   const fraction = fixedNum.slice(fixedNum.length - 2, fixedNum.length);
 
-  //debugging
-  console.log("num: ", num);
-  console.log("fixedNum: ", fixedNum);
-  console.log("integer: ", integer);
-  console.log("fraction: ", fraction);
-  console.log("-------------");
+  if (integer.length > 15) {
+    return "ОШИБКА: слишком большое число"
+  }
 
   // проверяем есть ли целая часть (рубли)
   // если нет, возвращаем копейки
   if (integer == 0) {
-    console.log("Сработало условие 'целая часть равна нулю'"); //debugging
     return pennies(fraction);
   }
 
-  console.log("Производится расчёт:"); //debugging
-
   const textInteger = []; // массив, состоящий из слов, составляющих полное наименование целой части числа
   const textCurrency = currency(integer.slice(integer.length - 2, integer.length));
-
-  // циклом проходим по строке справа налево с шагом 3,
-  // иммитируя проход по классам многозначного числа начиная с первого класса.
-  // указатель current указывает на последнюю (правую) цифру класса.
-  // hundredDegree - степень тысячи, вычисляется в процессе работы цикла,
-  // используется для назначения имени степени тысячи в правилном падеже
-  // nullClass - маркер нулевого класса (класс состоит из нулей - 000)
 
   const degreeName = (prePrevious, previous, current, hundredDegree) => {
     const res = [];
@@ -226,7 +216,7 @@ function numToText(num) {
     }
 
     name =
-      !!hundredDegree && !name && (!!prePrevious || !!previous || !!current)
+        !!hundredDegree && !name && (!!prePrevious || !!previous || !!current)
         ? mapDegree[hundredDegree][5]
         : name;
 
@@ -235,6 +225,13 @@ function numToText(num) {
     }
     return res;
   };
+
+  // циклом проходим по строке справа налево с шагом 3,
+  // иммитируя проход по классам многозначного числа начиная с первого класса.
+  // указатель current указывает на последнюю (правую) цифру класса.
+  // hundredDegree - степень тысячи, вычисляется в процессе работы цикла,
+  // используется для назначения имени степени тысячи в правилном падеже
+  // nullClass - маркер нулевого класса (класс состоит из нулей - 000)
 
   for (let i = integer.length - 1, hundredDegree = 0; i >= 0; i = i - 3) {
     const current = Number(integer[i]);
@@ -245,14 +242,9 @@ function numToText(num) {
     hundredDegree++;
   }
 
-  console.log(textInteger);
-
   textInteger[0] = textInteger[0].slice(0, 1).toUpperCase() + textInteger[0].slice(1, textInteger[0].length);
 
   result = textInteger.join(" ") + " " + textCurrency + " " + pennies(fraction);
 
   return result;
 }
-
-//pretesting:
-console.log(numToText(63000));
