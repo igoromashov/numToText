@@ -6,7 +6,13 @@ function numToText(num) {
   // корректность работы обеспечена только в рамках функции numToText
   // т.к. обеспечена передача в функцию только валидных данных
   const currency = (lastDigit) => {
-    if (lastDigit[0] === "0") {
+    if (lastDigit.length === 2) {
+      if (lastDigit[0] === "1") {
+        return "рублей";
+      } else {
+        return currency(lastDigit.slice(1, 2));
+      }
+    } else {
       // от 0 до 9
       lastDigit = Number(lastDigit);
       if (lastDigit === 0 || lastDigit > 4) {
@@ -16,8 +22,6 @@ function numToText(num) {
       } else if (lastDigit > 1 && lastDigit <= 4) {
         return "рубля";
       }
-    } else if (lastDigit[0] === "1") {
-      return "рублей";
     }
   };
 
@@ -47,6 +51,7 @@ function numToText(num) {
 
   // карта наименования единиц
   const units = {
+    0: "",
     1: "один",
     2: "два",
     3: "три",
@@ -191,9 +196,7 @@ function numToText(num) {
   console.log("Производится расчёт:"); //debugging
 
   const textInteger = []; // массив, состоящий из слов, составляющих полное наименование целой части числа
-  const textCurrency = currency(
-    integer.slice(integer.length - 2, integer.length)
-  );
+  const textCurrency = currency(integer.slice(integer.length - 2, integer.length));
 
   // циклом проходим по строке справа налево с шагом 3,
   // иммитируя проход по классам многозначного числа начиная с первого класса.
@@ -201,66 +204,59 @@ function numToText(num) {
   // hundredDegree - степень тысячи, вычисляется в процессе работы цикла,
   // используется для назначения имени степени тысячи в правилном падеже
   // nullClass - маркер нулевого класса (класс состоит из нулей - 000)
-  for (
-    let i = integer.length - 1, hundredDegree = 0, nullClass = false;
-    i >= 0;
-    i = i - 3
-  ) {
-    const current = Number(integer[i]);
 
-    if (integer.length === 1) {
+  const degreeName = (prePrevious, previous, current, length, hundredDegree) => {
+    const res = [];
+    if (length === 1) {
       // для чисел от 1 до 9
-      textInteger.unshift(units[current]);
-    } else if (integer.length === 2) {
+      res.unshift(units[current]);
+    } else if (length === 2) {
       // для чисел от 10 до 99
-      const previous = Number(integer[i - 1]);
       if (current === 0) {
-        textInteger.unshift(tens[previous]);
+        res.unshift(tens[previous]);
       } else if (previous === 1) {
-        textInteger.unshift(elevens[current]);
+        res.unshift(elevens[current]);
       } else if (previous > 1) {
-        textInteger.unshift(tens[previous], units[current]);
+        res.unshift(tens[previous], units[current]);
       }
-    } else if (integer.length > 2 && integer.length < 4) {
+    } else if (length > 2 && length <= 3) {
       // для чисел от 100 до 999
-      const previous = Number(integer[i - 1]);
-      const prePrevious = Number(integer[i - 2]);
-
       if (current === 0) {
         if (previous === 0) {
           // prePrevios в таком случае не может быть равен нулю
-          textInteger.unshift(hundreds[prePrevious]);
+          res.unshift(hundreds[prePrevious]);
         } else {
-          textInteger.unshift(hundreds[prePrevious], tens[previous]);
+          res.unshift(hundreds[prePrevious], tens[previous]);
         }
       } else {
         if (previous === 0) {
           if (prePrevious === 0) {
-            textInteger.unshift(units[current]);
+            res.unshift(units[current]);
           } else {
-            textInteger.unshift(hundreds[prePrevious], units[current]);
+            res.unshift(hundreds[prePrevious], units[current]);
           }
         } else if (previous === 1) {
           if (prePrevious === 0) {
-            textInteger.unshift(elevens[current]);
+            res.unshift(elevens[current]);
           } else {
-            textInteger.unshift(hundreds[prePrevious], elevens[previous]);
+            res.unshift(hundreds[prePrevious], elevens[previous]);
           }
         } else {
-          textInteger.unshift(
-            hundreds[prePrevious],
-            tens[previous],
-            units[current]
-          );
+          res.unshift(hundreds[prePrevious], tens[previous], units[current]);
         }
       }
-    } else {
+    } else if (length > 3 && length <= 20){
       // для чисел x >= 1000
     }
+    return res;
+  }
 
-    if (hundredDegree === 0) {
-    }
+  for (let i = integer.length - 1, hundredDegree = 0; i >= 0; i = i - 3) {
+    const current = Number(integer[i]);
+    const previous = Number(integer[i - 1]);
+    const prePrevious = Number(integer[i - 2]);
 
+    textInteger.unshift(... degreeName(prePrevious, previous, current, integer.length, hundredDegree));
     hundredDegree++;
   }
 
@@ -276,4 +272,4 @@ function numToText(num) {
 }
 
 //pretesting:
-console.log(numToText(501));
+console.log(numToText(1000));
