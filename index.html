@@ -12,12 +12,14 @@
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
       crossorigin="anonymous"
     ></script>
+    <script src="https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js"></script>
+    <script src="./numToText.js"></script>
     <title>Numbers to text</title>
     <style>
       .mainContainer {
-        max-width: 900px;
+        width: 75%;
         margin: 0;
-        border: 3px #638fff;
+        border: solid 2px #3e3e3e5b;
         border-radius: 20px;
         padding: 30px;
         position: absolute;
@@ -26,8 +28,13 @@
         margin-right: -50%;
         transform: translate(-50%, -50%);
       }
-      h3, h5 {
+      h3,
+      h5 {
         text-align: center;
+      }
+      h5 {
+        margin-left: 50px;
+        margin-right: 50px;
       }
     </style>
   </head>
@@ -40,16 +47,34 @@
           class="form-control"
           placeholder="Введите сумму в рублях"
           aria-describedby="button-addon2"
+          id="inputValue"
         />
         <button
           class="btn btn-outline-secondary"
           type="button"
-          id="button-addon2"
+          id="convertButton"
+          onclick="{
+            const inputValue = document.getElementById('inputValue').value
+            document.getElementById('result').innerHTML = !!inputValue ? numToText(inputValue) : 'Результат'
+                    }"
         >
           Конвертировать
         </button>
       </div>
-      <h5>Результат</h5>
+      <h5 id="result">Результат</h5>
+      <div class="d-grid gap-2 mt-3">
+        <a class="btn btn-outline-secondary" type="button" href="./tests.html">
+          Тесты
+        </a>
+      </div>
     </div>
   </body>
+  <script>
+    $("#inputValue").keyup(function (event) {
+      if (event.keyCode == 13) {
+        $("#convertButton").click();
+        //$(this).val("");
+      }
+    });
+  </script>
 </html>

@@ -2,9 +2,6 @@
 // Используется как скрипт для Google Sheets для формирования счетов на оплату.
 
 function numToText(num) {
-  if (!num) {
-    return ''
-  }
   // функция выдачи валюты в необходимом падеже без указания количества
   // корректность работы обеспечена только в рамках функции numToText
   // т.к. обеспечена передача в функцию только валидных данных
@@ -32,7 +29,7 @@ function numToText(num) {
   // корректность работы обеспечена только в рамках функции numToText
   // т.к. обеспечена передача в функцию только валидных данных
   const pennies = (fraction) => {
-    lastDigit =
+    const lastDigit =
       Number(fraction) > 20
         ? Number(String(fraction).slice(1, 2))
         : Number(fraction);
@@ -175,15 +172,31 @@ function numToText(num) {
     },
   };
 
-  // конвертация полученного числа в строку (например 100.00)
-  const fixedNum = num.toFixed(2).toString();
+    // конвертация полученного числа в строку (например 100.00)
+    // если получена строка, запятая заменяется на точку (если обнаружена)
+    // утсанавливаем предельное принимаемое значение в 10 триллионов - 1 копейка (9...99.99)
+  let fixedNum = NaN;
+  if (typeof num === 'string') {
+    fixedNum = Number(num.replace(/,/, '.')).toFixed(2).toString();
+    if (fixedNum.length > 16) {
+      return "ОШИБКА: слишком большое число"
+    }
+  } else if (typeof num === 'number') {
+    if (num > 9999999999999.99) {
+      return "ОШИБКА: слишком большое число"
+    }
+    fixedNum = num.toFixed(2).toString();
+  } else {
+    fixedNum = NaN;
+  }
+  console.log(fixedNum)
   // отделение целой части (все цифры до дробного разделителя)
   const integer = fixedNum.slice(0, fixedNum.length - 3);
   // отделение дробной части (все цифры после дробного разделителя)
   const fraction = fixedNum.slice(fixedNum.length - 2, fixedNum.length);
 
-  if (integer.length > 15) {
-    return "ОШИБКА: слишком большое число"
+  if (fixedNum === "NaN") {
+    return "ОШИБКА: введены невалидные данные"
   }
 
   // проверяем есть ли целая часть (рубли)
@@ -216,7 +229,7 @@ function numToText(num) {
     }
 
     name =
-        !!hundredDegree && !name && (!!prePrevious || !!previous || !!current)
+      !!hundredDegree && !name && (!!prePrevious || !!previous || !!current)
         ? mapDegree[hundredDegree][5]
         : name;
 
