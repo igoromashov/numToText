@@ -1,5 +1,6 @@
 // Данная функция конвертирует число в текст.
 // Используется как скрипт для Google Sheets для формирования счетов на оплату.
+// Слово "класс" во всех комментариях обозначает класс числа (не класс JS).
 
 function numToText(num) {
   // функция выдачи валюты в необходимом падеже без указания количества
@@ -43,8 +44,6 @@ function numToText(num) {
       }
     }
   };
-
-  let result = "";
 
   // КАРТЫ НАИМЕНОВАНИЙ
   // (для рубля => в мужском роде)
@@ -172,29 +171,29 @@ function numToText(num) {
     },
   };
 
-    // конвертация полученного числа в строку (например 100.00)
-    // если получена строка, запятая заменяется на точку (если обнаружена)
-    // утсанавливаем предельное принимаемое значение в 10 триллионов - 1 копейка (9...99.99)
-  let fixedNum = NaN;
-  if (typeof num === 'string') {
-    fixedNum = Number(num.replace(/,/, '.')).toFixed(2).toString();
+  // конвертация полученного числа в строку (например 100.00)
+  // если получена строка, запятая заменяется на точку (если обнаружена)
+  // утсанавливаем предельное принимаемое значение в 10 триллионов - 1 копейка (9...99.99)
+  let fixedNum;
+  if (typeof num === "string") { // если в функцию передан тип "строка"
+    fixedNum = Number(num.replace(/,/, ".")).toFixed(2).toString(); // при ошибке получим "NaN"
     if (fixedNum.length > 16) {
       return "ОШИБКА: слишком большое число"
     }
-  } else if (typeof num === 'number') {
+  } else if (typeof num === "number") { // если в функцию передан тип "число"
     if (num > 9999999999999.99) {
       return "ОШИБКА: слишком большое число"
     }
     fixedNum = num.toFixed(2).toString();
-  } else {
-    fixedNum = NaN;
+  } else { // если в функцию передан любой другой тип данных (возможно есть смысл реализовать получение массива)
+    fixedNum = "NaN"; // иммитируем Number(невалидные данные).toString()
   }
-  console.log(fixedNum)
+
   // отделение целой части (все цифры до дробного разделителя)
   const integer = fixedNum.slice(0, fixedNum.length - 3);
   // отделение дробной части (все цифры после дробного разделителя)
   const fraction = fixedNum.slice(fixedNum.length - 2, fixedNum.length);
-
+  
   if (fixedNum === "NaN") {
     return "ОШИБКА: введены невалидные данные"
   }
@@ -206,37 +205,44 @@ function numToText(num) {
   }
 
   const textInteger = []; // массив, состоящий из слов, составляющих полное наименование целой части числа
-  const textCurrency = currency(integer.slice(integer.length - 2, integer.length));
+  const textCurrency = currency(integer.slice(integer.length - 2, integer.length)); // имя валюты по двум последним цифрам числа
 
+  // функция формирования имени класса имён чисел класса
+  // далее функцию вызываем в цикле
+  // аргументы: предпредпоследнее число (Х..), предпоследнее число (.Х.), текущее число (..Х), степень тысячи
   const degreeName = (prePrevious, previous, current, hundredDegree) => {
-    const res = [];
-    let name = null;
+    const res = [];   // создаётся результирующий массив
+    let name = null;  // создаётся имя класса
 
-    // для чисел от 1 до 999
-    if (previous !== 1) {
-      if (!!current) {
-        res.unshift(hundredDegree === 1 ? thousands[current] : units[current]);
-        name = !!hundredDegree ? mapDegree[hundredDegree][current] : null;
+    if (previous !== 1) { // исключаем числа *1* (*10-*19)
+      if (!!current) { // обработка единиц (**Х)
+        res.unshift(hundredDegree === 1 ? thousands[current] : units[current]);  // к тысячам особый подход, т.к. "тысяча" - женского рода
+        name = !!hundredDegree ? mapDegree[hundredDegree][current] : null; // если степень тысячи больше 0 формируется имя класса по единице (**Х)
       }
-      if (!!previous) {
+      if (!!previous) { // обработка десятков *Х*
         res.unshift(tens[previous]);
       }
-    } else {
-      res.unshift(!!current ? elevens[current] : tens[previous]);
+    } else {  // обработка чисел *1* (*10-*19)
+      res.unshift(!!current ? elevens[current] : tens[previous]); // проверка на число *10
     }
-    if (!!prePrevious) {
+    if (!!prePrevious) { // обработка сотен Х**
       res.unshift(hundreds[prePrevious]);
     }
 
+    // формирование имени класса
+    // если степень тысячи больше 0 и нет имени и класс не нулевой (000)
+    // тогда назначаем имя класса в родительном падеже мн. числе (соотвествует кол-ву >= 5)
+    // иначе назначаем ранее присвоенное (или нет) имя (имя по единице или null)
     name =
       !!hundredDegree && !name && (!!prePrevious || !!previous || !!current)
-        ? mapDegree[hundredDegree][5]
+        ? mapDegree[hundredDegree][5] 
         : name;
 
+    // если имя есть (не null), тогда записываем его в конец результирующего массива
     if (!!name) {
       res.push(name);
     }
-    return res;
+    return res; // возвращаем результирующий массив
   };
 
   // циклом проходим по строке справа налево с шагом 3,
@@ -250,14 +256,14 @@ function numToText(num) {
     const current = Number(integer[i]);
     const previous = Number(integer[i - 1]);
     const prePrevious = Number(integer[i - 2]);
-
+    // записываем элементы результирующего массива res из функции degreeName в массив полного имени числа
     textInteger.unshift(...degreeName(prePrevious, previous, current, hundredDegree));
     hundredDegree++;
   }
 
+  // назначаем первую букву первого слова (первого эл-та массива) заглавной
   textInteger[0] = textInteger[0].slice(0, 1).toUpperCase() + textInteger[0].slice(1, textInteger[0].length);
 
-  result = textInteger.join(" ") + " " + textCurrency + " " + pennies(fraction);
-
-  return result;
+  // возвращаем результат соединения элементов массива в строку через пробел, валюту и копейки
+  return textInteger.join(" ") + " " + textCurrency + " " + pennies(fraction);
 }
