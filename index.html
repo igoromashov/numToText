@@ -16,8 +16,12 @@
     <script src="./numToText.js"></script>
     <title>Numbers to text</title>
     <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+      }
       .mainContainer {
-        width: 75%;
+        width: 90%;
+        max-width: 600px;
         margin: 0;
         border: solid 2px #3e3e3e5b;
         border-radius: 20px;
@@ -27,6 +31,10 @@
         left: 50%;
         margin-right: -50%;
         transform: translate(-50%, -50%);
+        transition: 0.6s ease-out;
+      }
+      .mainContainer:hover {
+        box-shadow: 0 0 50px  #3e3e3e7f;
       }
       h3,
       h5 {
