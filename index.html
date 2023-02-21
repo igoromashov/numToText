@@ -17,13 +17,13 @@
     <title>Numbers to text</title>
     <style>
       body {
-        font-family: 'Roboto', sans-serif;
+        font-family: "Roboto", sans-serif;
+        transition: 1s;
       }
-      .mainContainer {
+      #mainContainer {
         width: 90%;
         max-width: 600px;
         margin: 0;
-        border: solid 2px #3e3e3e5b;
         border-radius: 20px;
         padding: 30px;
         position: absolute;
@@ -33,21 +33,97 @@
         transform: translate(-50%, -50%);
         transition: 0.6s ease-out;
       }
-      .mainContainer:hover {
-        box-shadow: 0 0 50px  #3e3e3e7f;
+      .day {
+        border: solid 2px rgb(144, 144, 144);
+        color: rgb(10, 10, 10);
+      }
+      .nigth {
+        border: solid 2px rgb(144, 144, 144);
+        color: rgb(245, 245, 245);
+      }
+      .day:hover {
+        border: solid 2px #0000005b;
+        box-shadow: 0 0 50px #4d4d4d7f;
+        background-color: rgb(245, 245, 245);
+      }
+      .nigth:hover {
+        border: solid 2px #ffffff5b;
+        box-shadow: 0 0 50px #a4a4a47f;
+        background-color: #242424;
+      }
+      
+      .settings {
+        left: 50%;
+        margin-right: -50%;
+        top: 8%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(255, 0, 0, 0.26);
+        position: absolute;
+        text-align: center;
+      }
+      .logoDN {
+        position: absolute;
+        transition: 0.6s ease-out;
+      }
+      .logoDN:hover {
+        scale: 150%;
+      }
+      #dayLogo {
+        color: rgb(0, 0, 0);
+        display: none;
       }
       h3,
       h5 {
         text-align: center;
       }
-      h5 {
+      /* h5 {
         margin-left: 50px;
         margin-right: 50px;
-      }
+      } */
     </style>
   </head>
-  <body>
-    <div class="mainContainer">
+  <body style="background-color: #2b2b2b; color: rgb(245, 245, 245);">
+    <div class="settings">
+      <svg
+        id="nigthLogo"
+        xmlns="http://www.w3.org/2000/svg"
+        width="30"
+        height="30"
+        fill="currentColor"
+        class="bi bi-moon-fill logoDN"
+        viewBox="0 0 16 16"
+        onclick="{
+          document.getElementById('nigthLogo').style.display = 'none';
+          document.getElementById('dayLogo').style.display = 'block';
+          document.getElementById('mainContainer').className = 'day';
+          document.querySelector('body').style.backgroundColor = 'rgb(245, 245, 245)'
+        }"
+      >
+        <path
+          d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"
+        />
+      </svg>
+      <svg
+        id="dayLogo"
+        xmlns="http://www.w3.org/2000/svg"
+        width="30"
+        height="30"
+        fill="currentColor"
+        class="bi bi-brightness-high-fill logoDN"
+        viewBox="0 0 16 16"
+        onclick="{
+          document.getElementById('dayLogo').style.display = 'none';
+          document.getElementById('nigthLogo').style.display = 'block';
+          document.getElementById('mainContainer').className = 'nigth';
+          document.querySelector('body').style.backgroundColor = '#2b2b2b'
+        }"
+      >
+        <path
+          d="M12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"
+        />
+      </svg>
+    </div>
+    <div id="mainContainer" class="nigth">
       <h3 class="mb-3">Конвертировать сумму в текст</h3>
       <div class="input-group mb-3">
         <input
@@ -73,6 +149,13 @@
       <div class="d-grid gap-2 mt-3">
         <a class="btn btn-outline-secondary" type="button" href="./tests.html">
           Тесты
+        </a>
+        <a
+          class="btn btn-outline-secondary"
+          type="button"
+          href="https://github.com/igoromashov/numToText"
+        >
+          GitHub
         </a>
       </div>
     </div>
