@@ -1,0 +1,73 @@
+body {
+  font-family: "Roboto", sans-serif;
+  transition: 1s;
+}
+h3,
+h5 {
+  text-align: center;
+}
+#dayLogo {
+  color: rgb(0, 0, 0);
+  display: none;
+}
+#mainContainer {
+  top: 12%;
+  transition: 0.6s ease-out;
+}
+#alert {
+  display: none;
+  align-items: center;
+  bottom: 5%;
+}
+#mainContainer,
+#alert {
+  position: absolute;
+  width: 90%;
+  max-width: 600px;
+  margin: 0;
+  border-radius: 20px;
+  padding: 30px;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, 0);
+}
+.day {
+  border: solid 2px rgb(144, 144, 144);
+  color: rgb(10, 10, 10);
+}
+.nigth {
+  border: solid 2px rgb(144, 144, 144);
+  color: rgb(245, 245, 245);
+}
+#mainContainer.day:hover {
+  border: solid 2px #0000005b;
+  box-shadow: 0 0 50px #4d4d4d7f;
+  background-color: rgb(245, 245, 245);
+}
+#mainContainer.nigth:hover {
+  border: solid 2px #ffffff5b;
+  box-shadow: 0 0 50px #a4a4a47f;
+  background-color: #242424;
+}
+.settings {
+  width: 90%;
+  max-width: 600px;
+  padding: 0;
+  left: 50%;
+  margin-right: -50%;
+  top: 6%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 0, 0, 0.26);
+  position: absolute;
+  display: flex;
+  justify-content: center;
+
+  align-items: center;
+}
+.logoDN {
+  position: absolute;
+  transition: 0.6s ease-out;
+}
+.logoDN:hover {
+  scale: 150%;
+}
