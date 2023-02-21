@@ -20,18 +20,34 @@
         font-family: "Roboto", sans-serif;
         transition: 1s;
       }
+      h3,
+      h5 {
+        text-align: center;
+      }
+      #dayLogo {
+        color: rgb(0, 0, 0);
+        display: none;
+      }
       #mainContainer {
+        top: 15%;
+        transition: 0.6s ease-out;
+      }
+      #alert {
+        display: none;
+        align-items: center;
+        bottom: 10%;
+      }
+      #mainContainer,
+      #alert {
+        position: absolute;
         width: 90%;
         max-width: 600px;
         margin: 0;
         border-radius: 20px;
         padding: 30px;
-        position: absolute;
-        top: 30%;
         left: 50%;
         margin-right: -50%;
-        transform: translate(-50%, -50%);
-        transition: 0.6s ease-out;
+        transform: translate(-50%, 0);
       }
       .day {
         border: solid 2px rgb(144, 144, 144);
@@ -41,21 +57,20 @@
         border: solid 2px rgb(144, 144, 144);
         color: rgb(245, 245, 245);
       }
-      .day:hover {
+      #mainContainer.day:hover {
         border: solid 2px #0000005b;
         box-shadow: 0 0 50px #4d4d4d7f;
         background-color: rgb(245, 245, 245);
       }
-      .nigth:hover {
+      #mainContainer.nigth:hover {
         border: solid 2px #ffffff5b;
         box-shadow: 0 0 50px #a4a4a47f;
         background-color: #242424;
       }
-      
       .settings {
         left: 50%;
         margin-right: -50%;
-        top: 8%;
+        top: 6%;
         transform: translate(-50%, -50%);
         background-color: rgba(255, 0, 0, 0.26);
         position: absolute;
@@ -68,21 +83,9 @@
       .logoDN:hover {
         scale: 150%;
       }
-      #dayLogo {
-        color: rgb(0, 0, 0);
-        display: none;
-      }
-      h3,
-      h5 {
-        text-align: center;
-      }
-      /* h5 {
-        margin-left: 50px;
-        margin-right: 50px;
-      } */
     </style>
   </head>
-  <body style="background-color: #2b2b2b; color: rgb(245, 245, 245);">
+  <body style="background-color: #2b2b2b; color: rgb(245, 245, 245)">
     <div class="settings">
       <svg
         id="nigthLogo"
@@ -96,6 +99,7 @@
           document.getElementById('nigthLogo').style.display = 'none';
           document.getElementById('dayLogo').style.display = 'block';
           document.getElementById('mainContainer').className = 'day';
+          document.getElementById('alert').className = 'day';
           document.querySelector('body').style.backgroundColor = 'rgb(245, 245, 245)'
         }"
       >
@@ -115,6 +119,7 @@
           document.getElementById('dayLogo').style.display = 'none';
           document.getElementById('nigthLogo').style.display = 'block';
           document.getElementById('mainContainer').className = 'nigth';
+          document.getElementById('alert').className = 'nigth';
           document.querySelector('body').style.backgroundColor = '#2b2b2b'
         }"
       >
@@ -138,15 +143,59 @@
           type="button"
           id="convertButton"
           onclick="{
-            const inputValue = document.getElementById('inputValue').value
-            document.getElementById('result').innerHTML = !!inputValue ? numToText(inputValue) : 'Результат'
-                    }"
+            const inputValue = document.getElementById('inputValue').value;
+            const result = document.getElementById('result');
+            const copyStyle = document.getElementById('copy').style;
+            document.getElementById('alert').style.display = 'none';
+            if (!!inputValue) {
+              result.style.display = 'block';
+              copyStyle.display = 'block';
+              const res = numToText(inputValue);
+              result.innerHTML = res;
+              console.log(res)
+              if (res === 'ОШИБКА: введены невалидные данные') {
+                copyStyle.display = 'none';
+              }
+            } else {
+              result.style.display = 'none';
+              copyStyle.display = 'none';
+            }
+          }"
         >
           Конвертировать
         </button>
       </div>
-      <h5 id="result">Результат</h5>
+      <h5 id="result"></h5>
       <div class="d-grid gap-2 mt-3">
+        <button
+          id="copy"
+          style="display: none"
+          type="button"
+          class="btn btn-outline-primary"
+          onclick="{
+            const result = document.getElementById('result').innerHTML;
+            const alert = document.getElementById('alert');
+            const alertIconOk = document.getElementById('alertOK');
+            navigator.clipboard.writeText(result)
+            .then(() => {
+              console.log('Текст успешно скопирован')
+              alert.style.display = 'flex';
+              alertIconOk.display = 'block';
+              $(function () {
+                $('#alert').delay(1500).fadeOut(750);
+              });
+            })
+            .catch(err => {
+              console.error('Ошибка копирования: ', err);
+              alert.style.backgroundColor = 'rgba(255, 0, 0, 0.26)';
+              alert.innerHTML = 'Ошибка копирования';
+              alertIconOk.display = 'none'
+              alert.style.display = 'flex';
+            })
+          }"
+        >
+          Скопировать результат в буфер обмена
+        </button>
         <a class="btn btn-outline-secondary" type="button" href="./tests.html">
           Тесты
         </a>
@@ -158,6 +207,26 @@
           GitHub
         </a>
       </div>
+    </div>
+    <div id="alert" class="nigth">
+      <svg
+        id="alertOK"
+        xmlns="http://www.w3.org/2000/svg"
+        width="30"
+        height="30"
+        fill="currentColor"
+        class="bi bi-clipboard-check-fill"
+        viewBox="0 0 16 16"
+        style="margin-right: 30px"
+      >
+        <path
+          d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"
+        />
+        <path
+          d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"
+        />
+      </svg>
+      Результат скопирован в буфер обмена
     </div>
   </body>
   <script>
