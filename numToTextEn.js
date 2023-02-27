@@ -1,0 +1,219 @@
+// This function converts a number to text.
+// Used as a script for Google Sheets to generate invoices.
+// The word "class" in all comments refers to the number class (not the JS class).
+
+function numToText(num, set = 1) {
+  // function for issuing currency in the required case without specifying the amount
+  // correct operation is ensured only within the framework of the numToText function
+  // because only valid data is passed to the function
+  const currency = (lastDigit) => {
+    const selectedCurrency = "dollar";
+    if (Number(lastDigit) === 1) {
+      return selectedCurrency;
+    } else {
+      return selectedCurrency + "s";
+    }
+  };
+
+  // function for issuing cents indicating the amount
+  // correct operation is ensured only within the framework of the numToText function
+  // because only valid data is passed to the function
+  const cents = (fraction) => {
+    const centName = "cent";
+    const numberName =
+      Number(fraction) === 0
+        ? "zero"
+        : degreeName(null, fraction[0], fraction[1]).filter(Boolean).join(" ");
+    if (Number(fraction) === 1) {
+      return `${numberName} ${centName}`;
+    } else {
+      return `${numberName} ${centName}s`;
+    }
+  };
+
+  // NAME MAPS
+  // unit name map
+  const units = {
+    0: "",
+    1: "one",
+    2: "two",
+    3: "three",
+    4: "four",
+    5: "five",
+    6: "six",
+    7: "seven",
+    8: "eight",
+    9: "nine",
+  };
+
+  // map of the names of the numbers of the first ten
+  const elevens = {
+    1: "eleven",
+    2: "twelve",
+    3: units[3] + "teen",
+    4: units[4] + "teen",
+    5: units[5] + "teen",
+    6: units[6] + "teen",
+    7: units[7] + "teen",
+    8: units[8] + "teen",
+    9: units[9] + "teen",
+  };
+
+  // name map of the number of tens
+  // full name is formed by concatenation with the name of the units (units)
+  const tens = {
+    1: "ten",
+    2: "twenty",
+    3: "thirty",
+    4: units[4] + "ty",
+    5: "fifty",
+    6: units[6] + "ty",
+    7: units[7] + "ty",
+    8: units[8] + "y",
+    9: units[9] + "ty",
+  };
+
+  // map of names of degrees of a thousand (classes)
+  // structure: mapDegree[k],
+  // i.e. 1000**k,
+  // k - degree of a thousand
+  const mapDegree = {
+    // k = 1 - thousands
+    1: "thousand",
+    // k = 2 - millions
+    2: "million",
+    // k = 3 - billions
+    3: "billion",
+    // k = 4 - trillions
+    4: "trillion",
+  };
+
+  // errors map
+  const errors = {
+    1: "ERROR: invalid data entered",
+    2: "ERROR: too large number entered",
+  };
+
+  let fixedNum;
+  let result;
+
+  // if an array is received, it is converted to a string anyway
+  if (Array.isArray(num)) {
+    num = num.join("");
+  }
+
+  // if a string is received, remove all spaces (if found)
+  // also the comma is replaced by a dot (if found)
+  // set the accepted value limit to 9999999999999.99 (9 trillion...)
+  // as a result, the resulting number is converted into a string (for example, 100.00)
+  if (typeof num === "string") {
+    fixedNum = Number(num.replace(/\s+/g, "").replace(/,/, "."))
+      .toFixed(2)
+      .toString();
+    if (fixedNum === "NaN") {
+      // if Number can't collect a number from a string, it will return NaN, then it will turn into "NaN"
+      return errors[1];
+    }
+  } else if (typeof num === "number") {
+    fixedNum = num.toFixed(2).toString();
+  } else {
+    return errors[1];
+  }
+
+  // check if the maximum processed number has been exceeded
+  // already, anyway num === "string", but casting types to the rescue...
+  if (num > 9999999999999.99) {
+    return errors[2];
+  }
+
+  // separating the integer part (all digits before the fractional separator)
+  const integer = fixedNum.slice(0, fixedNum.length - 3);
+  // separation of the fractional part (all digits after the fractional separator)
+  const fraction = fixedNum.slice(fixedNum.length - 2, fixedNum.length);
+
+  // check if there is an integer part
+  // if not, return cents
+  if (integer == 0) {
+    const result = !!set ? cents(fraction) : "zero";
+    return result.slice(0, 1).toUpperCase() + result.slice(1, result.length);
+  }
+
+  const textInteger = []; // array consisting of words that make up the full name of the integer part of the number
+
+  // function for forming the class name of class number names
+  // then call the function in a loop
+  // arguments: pre-previous number (X..), previous number (.X.), current number (..X), degree of a thousand
+  function degreeName(prePrevious, previous, current, hundredDegree = 0) {
+    const res = [];   // the resulting array is created
+    let name = null;  // class name is created
+
+    if (previous !== 1) {
+      // exclude numbers *1* (*10-*19)
+      if (!!current) {
+        // processing units (**X)
+        res.unshift(units[current]);
+        name = !!hundredDegree ? mapDegree[hundredDegree] : null; // if the degree of a thousand is greater than 0, the class name is generated by one (**X)
+      }
+      if (!!previous) {
+        // processing tens *X*
+        res.unshift(tens[previous]);
+      }
+    } else {
+      // processing numbers *1* (*10-*19)
+      res.unshift(!!current ? elevens[current] : tens[previous]); // проверка на число *10
+    }
+    if (!!prePrevious) {
+      // processing hundreds X**
+      res.unshift(units[prePrevious], "hundred");
+    }
+
+    // forming the class name
+    // if the thousand degree is greater than 0 and there is no name and the class is not null (000)
+    // then assign the class name in the genitive plural. number (corresponds to qty >= 5)
+    // otherwise, assign the previously assigned (or not) name (name by one or null)
+    name =
+      !!hundredDegree && !name && (!!prePrevious || !!previous || !!current)
+        ? mapDegree[hundredDegree]
+        : name;
+
+    // if the name exists (not null), then write it to the end of the resulting array
+    if (!!name) {
+      res.push(name);
+    }
+    return res; // return the resulting array
+  }
+
+  // cycle through the line from right to left with step 3,
+  // imitating passing through the classes of a multi-digit number starting from the first class.
+  // the current pointer points to the last (right) digit of the class.
+  // hundredDegree - degree of a thousand, calculated during the loop,
+  // used to assign the name of the power of a thousand in the correct case
+  // nullClass - null class marker (class consists of zeros - 000)
+
+  for (let i = integer.length - 1, hundredDegree = 0; i >= 0; i = i - 3) {
+    const current = Number(integer[i]);
+    const previous = Number(integer[i - 1]);
+    const prePrevious = Number(integer[i - 2]);
+    // write the elements of the resulting array res from the degreeName function to the array of the full name of the number
+    textInteger.unshift(...degreeName(prePrevious, previous, current, hundredDegree));
+    hundredDegree++;
+  }
+
+  switch (set) {
+    case 0: {
+      // return the result of joining the array elements into a string separated by a space
+      result = textInteger.join(" ");
+      break;
+    }
+    case 1: {
+      // return the result of joining the array elements into a string separated by a space, currency and pennies
+      const textCurrency = currency(integer.slice(integer.length - 2, integer.length)); // currency name based on the last two digits of the number
+      result = textInteger.join(" ") + " " + textCurrency + " and " + cents(fraction);
+      break;
+    }
+  }
+
+  // assign the first letter of the first word (the first element of the array) to capital
+  result = result.slice(0, 1).toUpperCase() + result.slice(1, result.length);
+  return result;
+}
