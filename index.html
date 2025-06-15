@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -15,158 +17,301 @@
     <script src="https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js"></script>
     <script src="./numToText.js"></script>
     <title>Numbers to text</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
   </head>
-  <body style="background-color: #2b2b2b; color: rgb(245, 245, 245)">
-    <div class="settings">
-      <svg
-        id="nigthLogo"
-        xmlns="http://www.w3.org/2000/svg"
-        width="30"
-        height="30"
-        fill="currentColor"
-        class="bi bi-moon-fill logoDN"
-        viewBox="0 0 16 16"
-        onclick="{
-          document.getElementById('nigthLogo').style.display = 'none';
-          document.getElementById('dayLogo').style.display = 'block';
-          document.getElementById('mainContainer').className = 'day';
-          document.getElementById('alert').className = 'day';
-          document.querySelector('body').style.backgroundColor = 'rgb(245, 245, 245)'
-        }"
-      >
-        <path
-          d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"
-        />
-      </svg>
-      <svg
-        id="dayLogo"
-        xmlns="http://www.w3.org/2000/svg"
-        width="30"
-        height="30"
-        fill="currentColor"
-        class="bi bi-brightness-high-fill logoDN"
-        viewBox="0 0 16 16"
-        onclick="{
-          document.getElementById('dayLogo').style.display = 'none';
-          document.getElementById('nigthLogo').style.display = 'block';
-          document.getElementById('mainContainer').className = 'nigth';
-          document.getElementById('alert').className = 'nigth';
-          document.querySelector('body').style.backgroundColor = '#2b2b2b'
-        }"
-      >
-        <path
-          d="M12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"
-        />
-      </svg>
+  <body class="dark-theme">
+    <!-- Animated background -->
+    <div class="animated-bg">
+      <div class="floating-shape shape-1"></div>
+      <div class="floating-shape shape-2"></div>
+      <div class="floating-shape shape-3"></div>
+      <div class="floating-shape shape-4"></div>
     </div>
-    <div id="mainContainer" class="nigth">
-      <h3 class="mb-3">Конвертировать сумму в текст</h3>
-      <div class="input-group mb-3">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Введите сумму в рублях"
-          aria-describedby="button-addon2"
-          id="inputValue"
-        />
-        <button
-          class="btn btn-outline-secondary"
-          type="button"
-          id="convertButton"
-          onclick="{
-            const inputValue = document.getElementById('inputValue').value;
-            const result = document.getElementById('result');
-            const copyStyle = document.getElementById('copy').style;
-            document.getElementById('alert').style.display = 'none';
-            if (!!inputValue) {
-              result.style.display = 'block';
-              copyStyle.display = 'block';
-              const res = numToText(inputValue);
-              result.innerHTML = res;
-              console.log(res)
-              if (res === 'ОШИБКА: введены невалидные данные' || res === 'ОШИБКА: слишком большое число') {
-                copyStyle.display = 'none';
-              }
-            } else {
-              result.style.display = 'none';
-              copyStyle.display = 'none';
-            }
-          }"
-        >
-          Конвертировать
-        </button>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle">
+      <input type="checkbox" id="theme-switch" />
+      <label for="theme-switch" class="theme-label">
+        <div class="toggle-track">
+          <div class="toggle-thumb">
+            <svg
+              class="sun-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"
+              />
+            </svg>
+            <svg
+              class="moon-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"
+              />
+            </svg>
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Main Container -->
+    <div id="mainContainer" class="main-container">
+      <div class="glass-card">
+        <div class="card-header">
+          <h1 class="main-title">
+            <span class="title-gradient">Конвертер</span>
+            <span class="title-accent">чисел в текст</span>
+          </h1>
+          <p class="subtitle">Преобразуйте числовую сумму в текстовый формат</p>
+        </div>
+
+        <div class="input-section">
+          <div class="modern-input-group">
+            <div class="input-wrapper">
+              <input
+                type="text"
+                id="inputValue"
+                class="modern-input"
+                placeholder=" "
+                autocomplete="off"
+              />
+              <label for="inputValue" class="input-label"
+                >Введите сумму в рублях</label
+              >
+            </div>
+            <button id="convertButton" class="convert-btn" type="button">
+              <span class="btn-text">Конвертировать</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="result-section" class="result-section" style="display: none">
+          <div class="result-card">
+            <div class="result-header">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"
+                />
+              </svg>
+              <span>Результат</span>
+            </div>
+            <div id="result" class="result-text"></div>
+            <button id="copyButton" class="copy-btn" type="button">
+              <svg
+                class="copy-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"
+                />
+              </svg>
+              <span class="copy-text">Копировать</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="actions-section">
+          <div class="action-buttons">
+            <a href="./tests.html" class="action-btn secondary">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"
+                />
+              </svg>
+              <span>Тесты</span>
+            </a>
+            <a
+              href="https://github.com/igoromashov/numToText"
+              class="action-btn secondary"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+                />
+              </svg>
+              <span>GitHub</span>
+            </a>
+          </div>
+        </div>
       </div>
-      <h5 id="result"></h5>
-      <div class="d-grid gap-2 mt-3">
-        <button
-          id="copy"
-          style="display: none"
-          type="button"
-          class="btn btn-outline-primary"
-          onclick="{
-            const result = document.getElementById('result').innerHTML;
-            const alert = document.getElementById('alert');
-            const alertIconOk = document.getElementById('alertOK');
-            navigator.clipboard.writeText(result)
+    </div>
+
+    <script>
+      // Theme switching
+      const themeSwitch = document.getElementById("theme-switch");
+      const body = document.body;
+
+      themeSwitch.addEventListener("change", function () {
+        if (this.checked) {
+          body.classList.remove("dark-theme");
+          body.classList.add("light-theme");
+        } else {
+          body.classList.remove("light-theme");
+          body.classList.add("dark-theme");
+        }
+      });
+
+      // Convert function
+      document
+        .getElementById("convertButton")
+        .addEventListener("click", function () {
+          const inputValue = document.getElementById("inputValue").value;
+          const resultSection = document.getElementById("result-section");
+          const result = document.getElementById("result");
+
+          if (!!inputValue) {
+            const res = numToText(inputValue);
+            result.innerHTML = res;
+            resultSection.style.display = "block";
+
+            // Add animation
+            resultSection.classList.remove("show");
+            setTimeout(() => {
+              resultSection.classList.add("show");
+            }, 10);
+
+            console.log(res);
+          } else {
+            resultSection.style.display = "none";
+          }
+        });
+
+      // Copy function
+      document
+        .getElementById("copyButton")
+        .addEventListener("click", function () {
+          const result = document.getElementById("result").innerHTML;
+
+          navigator.clipboard
+            .writeText(result)
             .then(() => {
-              console.log('Текст успешно скопирован')
-              alert.style.display = 'flex';
-              alertIconOk.display = 'block';
-              $(function () {
-                $('#alert').delay(1500).fadeOut(750);
-              });
+              showToast("Результат скопирован в буфер обмена", "success");
             })
-            .catch(err => {
-              console.error('Ошибка копирования: ', err);
-              alert.style.backgroundColor = 'rgba(255, 0, 0, 0.26)';
-              alert.innerHTML = 'Ошибка копирования';
-              alertIconOk.display = 'none'
-              alert.style.display = 'flex';
-            })
-          }"
-        >
-          Скопировать результат в буфер обмена
-        </button>
-        <a class="btn btn-outline-secondary" type="button" href="./tests.html">
-          Тесты
-        </a>
-        <a
-          class="btn btn-outline-secondary"
-          type="button"
-          href="https://github.com/igoromashov/numToText"
-        >
-          GitHub
-        </a>
-      </div>
-    </div>
-    <div id="alert" class="nigth">
-      <svg
-        id="alertOK"
-        xmlns="http://www.w3.org/2000/svg"
-        width="30"
-        height="30"
-        fill="currentColor"
-        class="bi bi-clipboard-check-fill"
-        viewBox="0 0 16 16"
-        style="margin-right: 30px"
-      >
-        <path
-          d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"
-        />
-        <path
-          d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"
-        />
-      </svg>
-      Результат скопирован в буфер обмена
-    </div>
-  </body>
-  <script>
-    $("#inputValue").keyup(function (event) {
-      if (event.keyCode == 13) {
-        $("#convertButton").click();
-        //$(this).val("");
+            .catch((err) => {
+              console.error("Ошибка копирования: ", err);
+              showToast("Ошибка копирования", "error");
+            });
+        });
+
+      // Toast function
+      function showToast(message, type = "success") {
+        const toastContainer = document.getElementById("toast-container");
+
+        // Create toast element
+        const toast = document.createElement("div");
+        toast.className = `toast-notification ${type}`;
+
+        toast.innerHTML = `
+          <div class="toast-content">
+            <div class="toast-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+              </svg>
+            </div>
+            <span class="toast-message">${message}</span>
+          </div>
+          <div class="toast-progress"></div>
+        `;
+
+        // Add to container
+        toastContainer.appendChild(toast);
+
+        // Trigger animation
+        setTimeout(() => {
+          toast.classList.add("show");
+        }, 10);
+
+        // Start progress animation
+        const progress = toast.querySelector(".toast-progress");
+        setTimeout(() => {
+          progress.style.animation = "toast-progress 3000ms linear forwards";
+        }, 100);
+
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => {
+            if (toast.parentNode) {
+              toast.parentNode.removeChild(toast);
+            }
+          }, 300);
+        }, 3000);
       }
-    });
-  </script>
+
+      // Enter key support
+      document
+        .getElementById("inputValue")
+        .addEventListener("keyup", function (event) {
+          if (event.keyCode === 13) {
+            document.getElementById("convertButton").click();
+          }
+        });
+
+      // Input focus effects
+      const modernInput = document.querySelector(".modern-input");
+
+      modernInput.addEventListener("focus", function () {
+        this.parentElement.classList.add("focused");
+      });
+
+      modernInput.addEventListener("blur", function () {
+        if (!this.value) {
+          this.parentElement.classList.remove("focused");
+        }
+      });
+
+      modernInput.addEventListener("input", function () {
+        if (this.value) {
+          this.parentElement.classList.add("has-value");
+        } else {
+          this.parentElement.classList.remove("has-value");
+        }
+      });
+
+      // Animate elements on load
+      window.addEventListener("load", function () {
+        document.querySelector(".main-container").classList.add("loaded");
+      });
+    </script>
+  </body>
 </html>
